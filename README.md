@@ -1,46 +1,175 @@
-# Getting Started with Create React App
+# 01-Birthday reminder
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+* Utilizes basic usage of **useState()** hook
+* Conditional render 
+* Events
+* TypeScript
+* CSS modules
+* React Icons library
 
-## Available Scripts
+```tsx
+import style from './BirthdayList.module.css';
+import { RiDeleteBin2Fill } from 'react-icons/ri';
 
-In the project directory, you can run:
+type Props = {
+  birthdays: {
+    id: number;
+    name: string;
+    age: number;
+    image: string;
+  }[];
+  onDelete: (id: number) => void;
+};
 
-### `npm start`
+const BirthdayList = ({ birthdays, onDelete }: Props) => {
+  return (
+    <>
+      <ul className={style.birthdayList}>
+        {birthdays.map(({ id, name, age, image }) => {
+          return (
+            <li key={id} className={style.birthdayCard}>
+              <div className={style.imageWrapper}>
+                <img src={image} alt={name} />
+              </div>
+              <div className={style.detailsWrapper}>
+                <h2 className={style.name}>{name}</h2>
+                <p className={style.age}>turns {age} today</p>
+              </div>
+              <button
+                type="button"
+                aria-label="delete"
+                onClick={() => onDelete(id)}>
+                <RiDeleteBin2Fill className={style.trashIcon} size={20} />
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </>
+  );
+};
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+```
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+ App components looks like this 
 
-### `npm test`
+```tsx
+import React, { useState } from 'react';
+import style from './App.module.css';
+import BirthdayList from './BirthdayList/BirthdayList';
+import birthdayData from '../data';
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+function App() {
+  const [birthdays, setBirthdays] = useState(birthdayData);
 
-### `npm run build`
+  const handleDeleteBirthday = (id: number) => {
+    setBirthdays(birthdays.filter(birthday => birthday.id !== id));
+  };
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+  const birthdaysCount = birthdays.length;
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+  return (
+    <section>
+      {birthdaysCount !== 0 ? (
+        <h1>Birthdays today: {birthdaysCount}</h1>
+      ) : (
+        <p className={style.noBirthdaysText}>No birthdays today</p>
+      )}
+      {birthdays.length > 0 && (
+        <BirthdayList birthdays={birthdays} onDelete={handleDeleteBirthday} />
+      )}
+    </section>
+  );
+}
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+export default App;
+```
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+And some of the CSS 
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```css
+.heading {
+  text-align: center;
+}
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+.birthdayList {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 700px;
+  width: 100%;
+  margin: 0 auto;
+  background-color: #f5ede5;
+  padding: 2rem 1rem;
+  border-radius: 2px;
+}
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+.birthdayCard {
+  background-color: #fff;
+  border-radius: 4px;
+  padding: 1rem 1rem;
+  list-style: none;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
 
-## Learn More
+.name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.2rem;
+}
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+.age {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.8rem;
+}
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+.birthdayCard + .birthdayCard {
+  margin-top: 1rem;
+}
+
+.imageWrapper {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.detailsWrapper {
+}
+
+img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: 50% 30%;
+}
+
+button {
+  display: block;
+  border: none;
+  background-color: #eeeeee;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+button:hover,
+button:focus {
+  background-color: #545454;
+}
+
+.trashIcon {
+  color: #545454;
+}
+
+button:hover .trashIcon,
+button:focus .trashIcon {
+  color: #e5e5e5;
+}
+
+```
